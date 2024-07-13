@@ -1,29 +1,23 @@
 import random
-import time
+from utils import screen_cleaner
 
-def generate_sequence(difficulty):
-    return [random.randint(1, 101) for _ in range(difficulty)]
-
-def get_list_from_user(difficulty):
-    user_input = input(f"Enter the sequence of {difficulty} numbers separated by space: ")
-    return list(map(int, user_input.split()))
-
-def is_list_equal(sequence, user_sequence):
-    return sequence == user_sequence
-
-def clear_screen():
-    # Simulate clearing the screen by printing newlines
-    print("\n" * 100)
 
 def play(difficulty):
-    sequence = generate_sequence(difficulty)
-    print(f"Remember this sequence: {sequence}")
-    time.sleep(0.7)
-    clear_screen()  # Simulate clearing the screen after showing the sequence
-    user_sequence = get_list_from_user(difficulty)
-    if is_list_equal(sequence, user_sequence):
-        print("You remembered the sequence correctly!")
+    sequence_length = difficulty + 2
+    sequence = [random.randint(1, 101) for _ in range(sequence_length)]
+
+    screen_cleaner()
+    print("Memorize the sequence:")
+    print(sequence)
+    input("Press Enter when you are ready to proceed...")
+
+    screen_cleaner()
+    guess = input("Enter the sequence, separated by spaces: ").split()
+    guess = [int(num) for num in guess]
+
+    if guess == sequence:
+        print("Congratulations! You won!")
         return True
     else:
-        print("Sorry, that was incorrect.")
+        print(f"Sorry, the correct sequence was {sequence}.")
         return False

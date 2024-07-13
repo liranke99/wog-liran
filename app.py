@@ -1,5 +1,13 @@
+from utils import screen_cleaner
+from score import add_score
+
+def welcome():
+    username = input("Hey, what is your username: ")
+    print(f"Hey {username}, welcome to the World of Games: The Epic Journey")
+
 def start_play():
     while True:
+        screen_cleaner()
         print('''Please choose a game to play:
 1. Memory Game - a sequence of numbers will appear for 1 second and you have to guess it back.
 2. Guess Game - guess a number and see if you chose like the computer.
@@ -29,13 +37,16 @@ def start_play():
 
         if game == 1:
             from memory_game import play
-            play(difficulty)
+            won = play(difficulty)
         elif game == 2:
             from guess_game import play
-            play(difficulty)
+            won = play(difficulty)
         elif game == 3:
             from currency_roulette_game import play
-            play(difficulty)
+            won = play(difficulty)
+
+        if won:
+            add_score(difficulty)
 
         while True:
             play_again = input("Do you want to play another game? (yes/no): ").strip().lower()
@@ -47,3 +58,7 @@ def start_play():
         if play_again == 'no':
             print("Thank you for playing! Goodbye.")
             break
+
+if __name__ == "__main__":
+    welcome()
+    start_play()
