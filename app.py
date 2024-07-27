@@ -50,13 +50,13 @@ def start_play():
 
         while True:
             play_again = input("Do you want to play another game? (yes/no): ").strip().lower()
-            if play_again in ['yes', 'no']:
+            if play_again in ["yes", "no"]:
                 break
             else:
-                print("Invalid input. Please enter 'yes' or 'no'.")
+                print("Invalid choice. Please enter 'yes' or 'no'.")
 
-        if play_again == 'no':
-            print("Thank you for playing! Goodbye.")
+        if play_again == "no":
+            print("Thank you for playing! See you next time!")
             break
 
 if __name__ == "__main__":
