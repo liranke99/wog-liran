@@ -1,9 +1,9 @@
 from flask import Flask, render_template_string
-from utils import SCORES_FILE_NAME, BAD_RETURN_CODE
+from utils import SCORES_FILE_NAME
 
 app = Flask(__name__)
 
-@app.route('/score')
+@app.route('/')
 def score_server():
     try:
         with open(SCORES_FILE_NAME, 'r') as file:
@@ -35,4 +35,4 @@ def score_server():
         return render_template_string(error_html_content, error=str(e))
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(host='0.0.0.0', port=5000)
