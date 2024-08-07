@@ -1,41 +1,55 @@
 pipeline {
     agent any
-
+    environment {
+        IMAGE_NAME = 'world-of-games-app'
+        DOCKER_HUB_REPO = 'your-dockerhub-username/world-of-games-app'
+    }
     stages {
-        stage('Checkout') {
+        stage('Clean UP') {
             steps {
-                git 'https://github.com/your-repo-url.git'
+                deleteDir()
             }
         }
-        stage('Build') {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/liranke99/wog-liran.git'
+            }
+        }
+        stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build('world-of-games-app')
+                    // Convert Windows path to Unix-style path for Docker
+                    def workspaceUnixPath = sh(script: 'echo $WORKSPACE', returnStdout: true).trim().replaceAll('\\\\', '/').replaceAll('C:', '/mnt/c')
+                    bat "docker build -t ${IMAGE_NAME} ${workspaceUnixPath}"
                 }
             }
         }
-        stage('Run') {
+        stage('Run Docker Container') {
             steps {
                 script {
-                    app = docker.run('world-of-games-app', '-p 5000:5000', '-v $PWD/Scores.txt:/Scores.txt')
+                    // Convert Windows path to Unix-style path for Docker volume mount
+                    def workspaceUnixPath = sh(script: 'echo $WORKSPACE', returnStdout: true).trim().replaceAll('\\\\', '/').replaceAll('C:', '/mnt/c')
+                    bat "docker run -d -t -v /mnt/c/Users/matan/OneDrive/מסמכים/GitHub/wog-liran/Scores.txt:/app/Scores.txt -p 5000:5000 -w ${workspaceUnixPath} ${IMAGE_NAME} cmd.exe"
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    def result = sh(script: 'python e2e.py', returnStatus: true)
-                    if (result != 0) {
-                        error "Tests failed"
-                    }
+                    bat "docker exec $(docker ps -q -f name=${IMAGE_NAME}) python e2e.py"
                 }
             }
         }
-        stage('Finalize') {
+        stage('Docker Compose Down') {
+            steps {
+                bat "docker-compose down"
+            }
+        }
+        stage('Push Docker Image') {
             steps {
                 script {
-                    app.stop()
-                    docker.build('world-of-games-app').push('your-dockerhub-username/world-of-games-app')
+                    bat "docker tag ${IMAGE_NAME} ${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
+                    bat "docker push ${DOCKER_HUB_REPO}:${BUILD_NUMBER}"
                 }
             }
         }
